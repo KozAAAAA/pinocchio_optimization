@@ -49,7 +49,7 @@ class Robot:
             q = pin.integrate(self.model, q, v * dt)
             i += 1
         
-        q = [(angle + np.pi) % (2 * np.pi) - np.pi for angle in q]
+        # q = [(angle + np.pi) % (2 * np.pi) - np.pi for angle in q]
         return success, q, err
 
     def forward_dynamics(self, q, dq, tau):

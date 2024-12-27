@@ -5,6 +5,7 @@ from environment import Environment
 from robot import Robot
 import pinocchio as pin
 
+Z = 0.5
 TP = 1.0 / 500
 SIM_TIME = 10.0
 URDF_PATH = "iiwa_cup.urdf"
@@ -25,10 +26,10 @@ def main():
 
     Rv = np.array([[0, 0, 1], [1, 0, 0], [0, 1, 0]])
     oMdes = [
-        pin.SE3(Rv, np.array([0.2, 0.2, 1])),
-        pin.SE3(Rv, np.array([0.2, -0.2, 1])),
-        pin.SE3(Rv, np.array([-0.2, -0.2, 1])),
-        pin.SE3(Rv, np.array([-0.2, 0.2, 1])),
+        pin.SE3(Rv, np.array([0.5, 0.4, Z])),
+        pin.SE3(Rv, np.array([0.4, 0.4, Z])),
+        pin.SE3(Rv, np.array([0.5, 0.4, Z])),
+        pin.SE3(Rv, np.array([0.4, 0.4, Z])),
     ]
 
     q = np.zeros((1, 7))
