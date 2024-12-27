@@ -7,7 +7,7 @@ import numpy as np
 
 
 class Environment:
-    def __init__(self, urdf_path, timestep, q0l, xyz, r):
+    def __init__(self, urdf_path, timestep, q0l, circles):
         self._client = BulletClient(
             connection_mode=pybullet.GUI,
             options="--background_color_red=0.57 --background_color_green=0.88 --background_color_blue=0.5",
@@ -52,10 +52,14 @@ class Environment:
                 angularDamping=0.0,
             )
 
-        sphere = pybullet.createVisualShape(
-            pybullet.GEOM_SPHERE, radius=r, rgbaColor=[1.0, 0.0, 0.0, 0.4]
-        )
-        idx = pybullet.createMultiBody(baseVisualShapeIndex=sphere, basePosition=xyz)
+        for circle in circles:
+            sphere = pybullet.createVisualShape(
+                pybullet.GEOM_SPHERE, radius=circle["r"], rgbaColor=[1.0, 0.0, 0.0, 0.4]
+            )
+            idx = pybullet.createMultiBody(
+                baseVisualShapeIndex=sphere, basePosition=circle["xyz"]
+            )
+
         self.reset_joints_state(q0l, np.zeros_like(q0l))
 
     def set_control(self, u):
