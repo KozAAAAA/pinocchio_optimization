@@ -23,10 +23,7 @@ class PathOptimizer:
             {
                 "type": "ineq",
                 "fun": self._circle_constraint,
-                "args": (
-                    circle,
-                    5,
-                ),
+                "args": (circle,),
             }
             for circle in circles
         ] + [
@@ -47,26 +44,13 @@ class PathOptimizer:
         points = np.vstack((self._first_point, optimized_points, self._last_point))
         return np.sum(np.linalg.norm(np.diff(points, axis=0), axis=1))
 
-        return np.sum(np.linalg.norm(np.diff(points, axis=0), axis=1))
-
-    def _circle_constraint(self, x, circle, resolution: int):
-        """I dont get this part"""
+    def _circle_constraint(self, x, circle):
+        """Always be outside of the circle"""
         optimized_points = x.reshape(-1, 2)
-        intersections = []
-        for i in range(len(optimized_points) - 1):
-            xp = np.linspace(
-                optimized_points[i][0], optimized_points[i + 1][0], resolution
-            )
-            yp = np.linspace(
-                optimized_points[i][1], optimized_points[i + 1][1], resolution
-            )
-            for x, y in zip(xp, yp):
-                intersections.append(
-                    np.sqrt((x - circle["x"]) ** 2 + (y - circle["y"]) ** 2)
-                    - circle["r"]
-                )
-        return np.min(intersections)
-        """I dont get this part"""
+        center_to_points = np.linalg.norm(
+            optimized_points - [circle["x"], circle["y"]], axis=1
+        )
+        return center_to_points - circle["r"]
 
     def _equal_distances_constraint(self, x):
         """
@@ -92,5 +76,6 @@ class PathOptimizer:
             options={"maxiter": maxiter},
             callback=self._iter_callback,
         )
+        print(f"Finished!")
         optimized_points = res.x.reshape(-1, 2)
         return optimized_points
