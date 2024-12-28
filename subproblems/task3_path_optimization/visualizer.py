@@ -27,5 +27,6 @@ class Visualizer:
                 color=colors[i],
                 linewidth=2,
             )
-        ax.scatter(points[:, 0], points[:, 1], color="black", zorder=3)
+            ax.scatter(points[i, 0], points[i, 1], color=colors[i], zorder=3)
+
         plt.show()

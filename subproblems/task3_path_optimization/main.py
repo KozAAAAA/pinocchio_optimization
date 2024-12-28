@@ -49,9 +49,10 @@ def main():
         circles=CIRCLES,
     )
 
-    optimized_points = opt.solve()
-    points = np.vstack((FIRST_POINT, optimized_points, LAST_POINT))
+    optimized_points = opt.solve(maxiter=1000)
+    
     initial_guess_points = np.vstack((FIRST_POINT, opt._initial_guess_points, LAST_POINT))
+    points = np.vstack((FIRST_POINT, optimized_points, LAST_POINT))
 
     viz.draw(initial_guess_points)
     viz.draw(points)
