@@ -12,12 +12,12 @@ class PathOptimizer:
 
     DIM = 3
 
-    def __init__(self, robot, n_segments, first_point, last_point, R):
+    def __init__(self, circles, n_segments, first_point, last_point, R):
         self._iter = 0
-        self._robot = robot
         self._n_optimizable_points = n_segments - 1
         self._first_point = first_point
         self._last_point = last_point
+        self._circles = circles
         self._R = R
 
         self._p0 = np.linspace(
@@ -30,11 +30,28 @@ class PathOptimizer:
         bound_y = (0, 2)
         bound_z = (0, 2)
         self._bounds = (bound_x, bound_y, bound_z) * self._n_optimizable_points
-        self._constraints = []
+        self._constraints = [
+            {
+                "type": "eq",
+                "fun": self._equal_distances_constraint,
+            }
+        ]
 
     def _objective(self, x):
         p = self._x2p(x)
         return np.sum(np.linalg.norm(np.diff(p, axis=0), axis=1))
+
+    def _circle_constraint(self, x, circle):
+        optimized_points = x.reshape(-1, 2)
+        center_to_points = np.linalg.norm(
+            optimized_points - [circle["x"], circle["y"]], axis=1
+        )
+        return center_to_points - circle["r"]
+
+    def _equal_distances_constraint(self, x):
+        p = self._x2p(x)
+        distances = np.linalg.norm(np.diff(p, axis=0), axis=1)
+        return np.diff(distances)
 
     def solve(self, maxiter):
         res = minimize(

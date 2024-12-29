@@ -12,15 +12,19 @@ URDF_PATH = "iiwa_cup.urdf"
 
 RV = np.array([[0, 0, 1], [1, 0, 0], [0, 1, 0]])
 N_SEGMENTS = 10
-FIRST_POINT = np.array([0.0, 0.0, 0.7])
-LAST_POINT = np.array([0.5, 0.0, 0.7])
+FIRST_POINT = np.array([0.5, 0.0, 0.7])
+LAST_POINT = np.array([0.5, 0.3, 0.7])
+
+CIRCLES = [
+    {"x": 0.5, "y": 0.15, "z": 0.7, "r": 0.05},
+]
 
 
 def main():
 
     robot = Robot(URDF_PATH)
     opt = PathOptimizer(
-        robot=robot,
+        circles=CIRCLES,
         n_segments=N_SEGMENTS,
         first_point=FIRST_POINT,
         last_point=LAST_POINT,
@@ -44,12 +48,7 @@ def main():
         urdf_path=URDF_PATH,
         timestep=TP,
         q0l=q[0],
-        circle={
-            "x": LAST_POINT[0],
-            "y": LAST_POINT[1],
-            "z": LAST_POINT[2],
-            "r": 0.15,
-        },
+        circles=CIRCLES,
     )
     for i in range(int(SIM_TIME / TP)):
         t_act = i * TP
