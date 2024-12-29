@@ -12,7 +12,7 @@ class PathOptimizer:
 
     DIM = 3
 
-    def __init__(self, robot, circle, n_segments, first_point, last_point, R):
+    def __init__(self, robot, n_segments, first_point, last_point, R):
         self._iter = 0
         self._robot = robot
         self._n_optimizable_points = n_segments - 1

@@ -6,31 +6,25 @@ from robot import Robot
 from path_optimizer import PathOptimizer
 import pinocchio as pin
 
-Z = 0.7
 TP = 1.0 / 500
 SIM_TIME = 10.0
 URDF_PATH = "iiwa_cup.urdf"
-CIRCLE = {
-    "x": 0.5,
-    "y": 0.5,
-    "z": 0.5,
-    "r": 0.15,
-}
+
+RV = np.array([[0, 0, 1], [1, 0, 0], [0, 1, 0]])
+N_SEGMENTS = 10
+FIRST_POINT = np.array([0.0, 0.0, 0.7])
+LAST_POINT = np.array([0.5, 0.0, 0.7])
 
 
 def main():
-    Rv = np.array([[0, 0, 1], [1, 0, 0], [0, 1, 0]])
-    first_point = np.array([0.0, 0.0, Z])
-    last_point = np.array([0.4, 0.4, Z])
 
     robot = Robot(URDF_PATH)
     opt = PathOptimizer(
         robot=robot,
-        circle=CIRCLE,
-        n_segments=10,
-        first_point=first_point,
-        last_point=last_point,
-        R=Rv,
+        n_segments=N_SEGMENTS,
+        first_point=FIRST_POINT,
+        last_point=LAST_POINT,
+        R=RV,
     )
 
     oMdes = opt.solve(1000)
@@ -50,7 +44,12 @@ def main():
         urdf_path=URDF_PATH,
         timestep=TP,
         q0l=q[0],
-        circle=CIRCLE,
+        circle={
+            "x": LAST_POINT[0],
+            "y": LAST_POINT[1],
+            "z": LAST_POINT[2],
+            "r": 0.15,
+        },
     )
     for i in range(int(SIM_TIME / TP)):
         t_act = i * TP
