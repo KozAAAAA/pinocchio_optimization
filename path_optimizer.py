@@ -17,7 +17,6 @@ class PathOptimizer:
         self._n_optimizable_points = n_segments - 1
         self._first_point = first_point
         self._last_point = last_point
-        self._circles = circles
         self._R = R
 
         self._p0 = np.linspace(
@@ -26,11 +25,14 @@ class PathOptimizer:
             num=self._n_optimizable_points + 2,
         )[1:-1]
 
-        bound_x = (0, 2)
-        bound_y = (0, 2)
-        bound_z = (0, 2)
-        self._bounds = (bound_x, bound_y, bound_z) * self._n_optimizable_points
         self._constraints = [
+            {
+                "type": "ineq",
+                "fun": self._circle_constraint,
+                "args": (circle,),
+            }
+            for circle in circles
+        ] + [
             {
                 "type": "eq",
                 "fun": self._equal_distances_constraint,
@@ -42,11 +44,10 @@ class PathOptimizer:
         return np.sum(np.linalg.norm(np.diff(p, axis=0), axis=1))
 
     def _circle_constraint(self, x, circle):
-        optimized_points = x.reshape(-1, 2)
-        center_to_points = np.linalg.norm(
-            optimized_points - [circle["x"], circle["y"]], axis=1
-        )
-        return center_to_points - circle["r"]
+        p = self._x2p(x)
+        center = np.array([circle["x"], circle["y"], circle["z"]])
+        c2p = np.linalg.norm(p - center, axis=1)
+        return c2p - circle["r"]
 
     def _equal_distances_constraint(self, x):
         p = self._x2p(x)
@@ -58,7 +59,6 @@ class PathOptimizer:
             self._objective,
             x0=self._p0.flatten(),
             constraints=self._constraints,
-            bounds=self._bounds,
             options={"maxiter": maxiter},
             callback=self._iter_callback,
         )

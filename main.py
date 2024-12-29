@@ -13,10 +13,10 @@ URDF_PATH = "iiwa_cup.urdf"
 RV = np.array([[0, 0, 1], [1, 0, 0], [0, 1, 0]])
 N_SEGMENTS = 10
 FIRST_POINT = np.array([0.5, 0.0, 0.7])
-LAST_POINT = np.array([0.5, 0.3, 0.7])
+LAST_POINT = np.array([0.5, 0.35, 0.7])
 
 CIRCLES = [
-    {"x": 0.5, "y": 0.15, "z": 0.7, "r": 0.05},
+    {"x": 0.5, "y": 0.15, "z": 0.7, "r": 0.15},
 ]
 
 
