@@ -3,36 +3,39 @@ import numpy as np
 from scipy.interpolate import interp1d
 from environment import Environment
 from robot import Robot
+from path_optimizer import PathOptimizer
 import pinocchio as pin
 
-Z = 0.5
+Z = 0.7
 TP = 1.0 / 500
 SIM_TIME = 10.0
 URDF_PATH = "iiwa_cup.urdf"
-CIRCLES = (
-    {
-        "xyz": [0.5, 0.5, 0.5],
-        "r": 0.15,
-    },
-    {
-        "xyz": [0.5, -0.5, 0.5],
-        "r": 0.15,
-    },
-)
+CIRCLE = {
+    "x": 0.5,
+    "y": 0.5,
+    "z": 0.5,
+    "r": 0.15,
+}
 
 
 def main():
-    robot = Robot(URDF_PATH)
-
     Rv = np.array([[0, 0, 1], [1, 0, 0], [0, 1, 0]])
-    oMdes = [
-        pin.SE3(Rv, np.array([0.5, 0.4, Z])),
-        pin.SE3(Rv, np.array([0.4, 0.4, Z])),
-        pin.SE3(Rv, np.array([0.5, 0.4, Z])),
-        pin.SE3(Rv, np.array([0.4, 0.4, Z])),
-    ]
+    first_point = np.array([0.0, 0.0, Z])
+    last_point = np.array([0.4, 0.4, Z])
 
-    q = np.zeros((1, 7))
+    robot = Robot(URDF_PATH)
+    opt = PathOptimizer(
+        robot=robot,
+        circle=CIRCLE,
+        n_segments=10,
+        first_point=first_point,
+        last_point=last_point,
+        R=Rv,
+    )
+
+    oMdes = opt.solve(1000)
+
+    q = np.empty((0, 7))
     for i, oMd in enumerate(oMdes):
         sucess, qd, err = robot.inverse_kinematics(oMd, "F_joint_7")
         if not sucess:
@@ -47,7 +50,7 @@ def main():
         urdf_path=URDF_PATH,
         timestep=TP,
         q0l=q[0],
-        circles=CIRCLES,
+        circle=CIRCLE,
     )
     for i in range(int(SIM_TIME / TP)):
         t_act = i * TP

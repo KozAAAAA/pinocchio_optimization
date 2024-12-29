@@ -1,8 +1,3 @@
-"""
-Zdefinuj problem optymalizacyjny jako minimalizacje dlugości łamanej złożonej z 20 odcinków, przy ograni-
-czeniach wynikających z unikania kolizji z 3 kolistymi przeszkodami o różnych promieniach.
-"""
-
 import numpy as np
 
 from path_optimizer import PathOptimizer
